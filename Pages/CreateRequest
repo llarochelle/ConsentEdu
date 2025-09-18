@@ -1,0 +1,107 @@
+import React, { useState } from "react";
+import { ConsentRequest } from "@/entities/ConsentRequest";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Save, Send } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+import RequestForm from "../components/requests/RequestForm";
+import PreviewCard from "../components/requests/PreviewCard";
+
+export default function CreateRequest() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    type: "sortie_scolaire",
+    target_audience: "classe_specifique",
+    target_details: "",
+    deadline: "",
+    activity_date: "",
+    additional_info: "",
+    status: "brouillon"
+  });
+  const [isPreview, setIsPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async (status = "brouillon") => {
+    setIsSaving(true);
+    try {
+      await ConsentRequest.create({
+        ...formData,
+        status: status
+      });
+      navigate(createPageUrl("Dashboard"));
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+    }
+    setIsSaving(false);
+  };
+
+  const isFormValid = formData.title && formData.description && formData.deadline;
+
+  return (
+    <div className="p-4 md:p-8 min-h-screen">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* En-tête */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Dashboard"))}
+              className="hover:bg-blue-50"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
+                Nouvelle demande de consentement
+              </h1>
+              <p className="text-slate-600 mt-1">
+                Créez une nouvelle demande pour vos élèves
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsPreview(!isPreview)}
+              className="hover:bg-blue-50"
+            >
+              {isPreview ? "Modifier" : "Aperçu"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleSave("brouillon")}
+              disabled={!isFormValid || isSaving}
+              className="hover:bg-slate-50"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Sauvegarder
+            </Button>
+            <Button
+              onClick={() => handleSave("active")}
+              disabled={!isFormValid || isSaving}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Publier
+            </Button>
+          </div>
+        </div>
+
+        {/* Contenu principal */}
+        {!isPreview ? (
+          <RequestForm
+            formData={formData}
+            setFormData={setFormData}
+          />
+        ) : (
+          <PreviewCard formData={formData} />
+        )}
+      </div>
+    </div>
+  );
+}

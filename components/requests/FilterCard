@@ -1,0 +1,28 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Filter } from "lucide-react";
+
+export default function FilterBar({ onFilterChange }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <Filter className="w-4 h-4 text-slate-500" />
+        <Select defaultValue="all" onValueChange={(value) => onFilterChange({ type: value })}>
+          <SelectTrigger className="w-40 bg-white">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les types</SelectItem>
+            <SelectItem value="sortie_scolaire">Sortie scolaire</SelectItem>
+            <SelectItem value="utilisation_photos">Utilisation photos</SelectItem>
+            <SelectItem value="activite_speciale">Activité spéciale</SelectItem>
+            <SelectItem value="transport">Transport</SelectItem>
+            <SelectItem value="medicament">Médicament</SelectItem>
+            <SelectItem value="autre">Autre</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}

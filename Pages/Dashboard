@@ -1,0 +1,169 @@
+import React, { useState, useEffect } from "react";
+import { ConsentRequest } from "@/entities/ConsentRequest";
+import { ConsentResponse } from "@/entities/ConsentResponse";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { 
+  FileText, 
+  Plus, 
+  Users, 
+  CheckCircle, 
+  Clock, 
+  AlertTriangle,
+  TrendingUp,
+  Calendar
+} from "lucide-react";
+
+import StatsCard from "../components/dashboard/StatsCard";
+import RecentRequests from "../components/dashboard/RecentRequests";
+import ResponsesChart from "../components/dashboard/ResponsesChart";
+
+export default function Dashboard() {
+  const [requests, setRequests] = useState([]);
+  const [responses, setResponses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [requestsData, responsesData] = await Promise.all([
+        ConsentRequest.list("-created_date"),
+        ConsentResponse.list("-created_date")
+      ]);
+      setRequests(requestsData);
+      setResponses(responsesData);
+    } catch (error) {
+      console.error("Erreur lors du chargement des données:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const activeRequests = requests.filter(req => req.status === "active").length;
+  const totalResponses = responses.length;
+  const pendingResponses = requests.reduce((sum, req) => sum + (req.emails_sent - req.responses_received), 0);
+  const responseRate = requests.length > 0 
+    ? Math.round((totalResponses / requests.reduce((sum, req) => sum + req.emails_sent, 0)) * 100) || 0
+    : 0;
+
+  return (
+    <div className="p-4 md:p-8 min-h-screen">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* En-tête */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2">
+              Tableau de bord
+            </h1>
+            <p className="text-slate-600 text-lg">
+              Vue d'ensemble de vos demandes de consentement
+            </p>
+          </div>
+          <Link to={createPageUrl("CreateRequest")}>
+            <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3 text-lg">
+              <Plus className="w-5 h-5 mr-2" />
+              Nouvelle demande
+            </Button>
+          </Link>
+        </div>
+
+        {/* Cartes statistiques */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatsCard
+            title="Demandes actives"
+            value={activeRequests}
+            icon={FileText}
+            gradient="from-blue-500 to-blue-600"
+            trend={`${requests.filter(req => req.status === "brouillon").length} en brouillon`}
+          />
+          <StatsCard
+            title="Réponses reçues"
+            value={totalResponses}
+            icon={CheckCircle}
+            gradient="from-green-500 to-green-600"
+            trend="Aujourd'hui"
+          />
+          <StatsCard
+            title="En attente"
+            value={pendingResponses}
+            icon={Clock}
+            gradient="from-amber-500 to-amber-600"
+            trend="Réponses attendues"
+          />
+          <StatsCard
+            title="Taux de réponse"
+            value={`${responseRate}%`}
+            icon={TrendingUp}
+            gradient="from-purple-500 to-purple-600"
+            trend={responseRate > 80 ? "Excellent" : responseRate > 60 ? "Bon" : "À améliorer"}
+          />
+        </div>
+
+        {/* Contenu principal */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Demandes récentes */}
+          <div className="lg:col-span-2">
+            <RecentRequests 
+              requests={requests}
+              isLoading={isLoading}
+              onRequestUpdate={loadData}
+            />
+          </div>
+
+          {/* Graphique des réponses */}
+          <div>
+            <ResponsesChart 
+              requests={requests}
+              responses={responses}
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
+
+        {/* Actions rapides */}
+        <Card className="bg-gradient-to-r from-blue-50 to-slate-50 border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <Calendar className="w-5 h-5" />
+              Actions rapides
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <Link to={createPageUrl("CreateRequest")}>
+                <Card className="hover:shadow-md transition-all duration-200 cursor-pointer bg-white/80 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <Plus className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                    <h3 className="font-semibold text-slate-800">Créer une demande</h3>
+                    <p className="text-sm text-slate-600 mt-1">Nouvelle demande de consentement</p>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link to={createPageUrl("MyRequests")}>
+                <Card className="hover:shadow-md transition-all duration-200 cursor-pointer bg-white/80 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-green-600" />
+                    <h3 className="font-semibold text-slate-800">Mes demandes</h3>
+                    <p className="text-sm text-slate-600 mt-1">Gérer toutes vos demandes</p>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer bg-white/80 backdrop-blur-sm opacity-75">
+                <CardContent className="p-4 text-center">
+                  <Users className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+                  <h3 className="font-semibold text-slate-800">Listes d'élèves</h3>
+                  <p className="text-sm text-slate-600 mt-1">Gérer les contacts</p>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

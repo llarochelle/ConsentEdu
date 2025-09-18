@@ -1,0 +1,50 @@
+{
+  "name": "ConsentResponse",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "ID de la demande de consentement"
+    },
+    "student_name": {
+      "type": "string",
+      "description": "Nom de l'élève concerné"
+    },
+    "student_class": {
+      "type": "string",
+      "description": "Classe de l'élève"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Email du parent qui a répondu"
+    },
+    "parent_name": {
+      "type": "string",
+      "description": "Nom du parent"
+    },
+    "consent_given": {
+      "type": "boolean",
+      "description": "Consentement accordé ou refusé"
+    },
+    "comments": {
+      "type": "string",
+      "description": "Commentaires du parent"
+    },
+    "response_token": {
+      "type": "string",
+      "description": "Token unique pour cette réponse"
+    },
+    "response_date": {
+      "type": "string",
+      "format": "datetime",
+      "description": "Date et heure de la réponse"
+    }
+  },
+  "required": [
+    "request_id",
+    "student_name",
+    "parent_email",
+    "consent_given",
+    "response_token"
+  ]
+}

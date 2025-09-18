@@ -1,0 +1,205 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Users, Calendar, AlertTriangle } from "lucide-react";
+
+export default function RequestForm({ formData, setFormData }) {
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const typeOptions = [
+    { value: "sortie_scolaire", label: "Sortie scolaire" },
+    { value: "utilisation_photos", label: "Utilisation de photos" },
+    { value: "activite_speciale", label: "Activité spéciale" },
+    { value: "transport", label: "Transport" },
+    { value: "medicament", label: "Administration de médicament" },
+    { value: "autre", label: "Autre" }
+  ];
+
+  const audienceOptions = [
+    { value: "classe_specifique", label: "Classe spécifique" },
+    { value: "niveau_scolaire", label: "Niveau scolaire" },
+    { value: "cycle", label: "Cycle" },
+    { value: "ecole_entiere", label: "École entière" }
+  ];
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      {/* Informations principales */}
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-slate-800">
+            <FileText className="w-5 h-5" />
+            Informations principales
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-slate-700 font-medium">
+              Titre de la demande *
+            </Label>
+            <Input
+              id="title"
+              placeholder="Ex: Sortie au zoo de Granby"
+              value={formData.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+              className="bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-slate-700 font-medium">
+              Description détaillée *
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Décrivez l'activité, les détails importants, les autorisations nécessaires..."
+              value={formData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              className="min-h-32 bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type" className="text-slate-700 font-medium">
+              Type de consentement
+            </Label>
+            <Select value={formData.type} onValueChange={(value) => handleChange("type", value)}>
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="Sélectionnez le type" />
+              </SelectTrigger>
+              <SelectContent>
+                {typeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="additional_info" className="text-slate-700 font-medium">
+              Informations supplémentaires
+            </Label>
+            <Textarea
+              id="additional_info"
+              placeholder="Coût, matériel requis, contact d'urgence..."
+              value={formData.additional_info}
+              onChange={(e) => handleChange("additional_info", e.target.value)}
+              className="min-h-24 bg-white"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Public cible et dates */}
+      <div className="space-y-6">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <Users className="w-5 h-5" />
+              Public cible
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="target_audience" className="text-slate-700 font-medium">
+                Portée de la demande
+              </Label>
+              <Select 
+                value={formData.target_audience} 
+                onValueChange={(value) => handleChange("target_audience", value)}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Sélectionnez le public" />
+                </SelectTrigger>
+                <SelectContent>
+                  {audienceOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="target_details" className="text-slate-700 font-medium">
+                Précisions
+              </Label>
+              <Input
+                id="target_details"
+                placeholder={
+                  formData.target_audience === "classe_specifique" ? "Ex: 3A, 4B" :
+                  formData.target_audience === "niveau_scolaire" ? "Ex: 3e année" :
+                  formData.target_audience === "cycle" ? "Ex: 1er cycle" :
+                  "Laisser vide pour toute l'école"
+                }
+                value={formData.target_details}
+                onChange={(e) => handleChange("target_details", e.target.value)}
+                className="bg-white"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <Calendar className="w-5 h-5" />
+              Dates importantes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="activity_date" className="text-slate-700 font-medium">
+                Date de l'activité
+              </Label>
+              <Input
+                id="activity_date"
+                type="date"
+                value={formData.activity_date}
+                onChange={(e) => handleChange("activity_date", e.target.value)}
+                className="bg-white"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deadline" className="text-slate-700 font-medium">
+                Date limite de réponse *
+              </Label>
+              <Input
+                id="deadline"
+                type="date"
+                value={formData.deadline}
+                onChange={(e) => handleChange("deadline", e.target.value)}
+                className="bg-white"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Message d'information */}
+        <Card className="bg-gradient-to-r from-blue-50 to-slate-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-800">Information importante</p>
+                <p className="text-sm text-blue-700 mt-1">
+                  Une fois publiée, cette demande sera envoyée par courriel à tous les parents concernés. 
+                  Assurez-vous que toutes les informations sont correctes.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,87 @@
+{
+  "name": "ConsentRequest",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titre de la demande de consentement"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description détaillée de l'activité"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "sortie_scolaire",
+        "utilisation_photos",
+        "activite_speciale",
+        "transport",
+        "medicament",
+        "autre"
+      ],
+      "description": "Type de consentement demandé"
+    },
+    "target_audience": {
+      "type": "string",
+      "enum": [
+        "classe_specifique",
+        "niveau_scolaire",
+        "cycle",
+        "ecole_entiere"
+      ],
+      "description": "Public cible de la demande"
+    },
+    "target_details": {
+      "type": "string",
+      "description": "Détails du public cible (nom de classe, niveau, etc.)"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Date limite pour répondre"
+    },
+    "activity_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date de l'activité concernée"
+    },
+    "additional_info": {
+      "type": "string",
+      "description": "Informations supplémentaires importantes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "brouillon",
+        "active",
+        "fermee",
+        "archivee"
+      ],
+      "default": "brouillon",
+      "description": "Statut de la demande"
+    },
+    "emails_sent": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre d'emails envoyés"
+    },
+    "responses_received": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de réponses reçues"
+    },
+    "consent_given": {
+      "type": "number",
+      "default": 0,
+      "description": "Nombre de consentements accordés"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "type",
+    "target_audience",
+    "deadline"
+  ]
+}
